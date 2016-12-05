@@ -7,6 +7,9 @@ BUILDER_NUMBER=$4
 
 LOGIN_USER=pi
 
+NEW_HOSTNAME=${BUILDER_PREFIX}${BUILDER_NUMBER}
+SCRIPTS_DIR=/opt/floating-dock/builder
+
 SCRIPT_FILE=/tmp/floating-dock-${FLOATING_DOCK_ADDRESS}-${BUILDER_ADDRESS}-script
 
 cat > ${SCRIPT_FILE} <<SCRIPT
@@ -15,48 +18,26 @@ sudo su -
 
 echo "Installing dependencies"
 curl -s https://packagecloud.io/install/repositories/Hypriot/Schatzkiste/script.deb.sh | sudo bash
-apt-get -y install docker-hypriot autossh
+apt-get -y install docker-hypriot
 
 echo "Setting Hostname to ${BUILDER_PREFIX}${BUILDER_NUMBER}"
 
 sed -i s/\$(hostname)/${BUILDER_PREFIX}${BUILDER_NUMBER}/g /etc/hosts
 sed -i s/\$(hostname)/${BUILDER_PREFIX}${BUILDER_NUMBER}/g /etc/hostname
-
 hostname ${BUILDER_PREFIX}${BUILDER_NUMBER}
 
-echo "establishing SSH link to FloatingDock server"
-if [ ! -f ~/.ssh/id_rsa ]; then
-    echo "  Creating ssh key"
-    ssh-keygen -f ~/.ssh/id_rsa -N ""
-fi
 
-echo "  Adding floating dock server to known hosts"
-ssh-keyscan  ${FLOATING_DOCK_ADDRESS} >> ~/.ssh/known_hosts 2> /dev/null
+mkdir -p ${SCRIPTS_DIR}
+cd ${SCRIPTS_DIR}
 
-echo "  Copying local ssh key to server"
-cp ~/.ssh/id_rsa.pub /tmp/id_rsa_root.pub
-cp ~/.ssh/id_rsa /tmp/id_rsa_root
-chmod 644 /tmp/id_rsa_root.pub
-chmod 644 /tmp/id_rsa_root
-exit
-
-mkdir -p .ssh
-ssh-keyscan  ${FLOATING_DOCK_ADDRESS} >> ~/.ssh/known_hosts 2> /dev/null
-ssh-copy-id -i /tmp/id_rsa_root.pub root@${FLOATING_DOCK_ADDRESS}
+wget https://${FLOATING_DOCK_ADDRESS}/builders/scripts.tar.gz
+tar -xzf scripts.tar.gz
 
 
-sudo su -
-
-rm -f /tmp/id_rsa_root.pub /tmp/id_rsa_root
-
-echo "  Setting up autossh - this builder will be reachable under port 100${BUILDER_NUMBER}"
 echo "#!/bin/bash" > /etc/rc.local
-echo "autossh -M 200${BUILDER_NUMBER}:300${BUILDER_NUMBER} -f -N -T -R 100${BUILDER_NUMBER}:localhost:22 ${FLOATING_DOCK_ADDRESS}" >> /etc/rc.local
+echo "nohup python ${SCRIPTS_DIR}/build_runner.py ${FLOATING_DOCK_ADDRESS} >> /var/log/floating_dock_runner.log &" >> /etc/rc.local
 chmod +x /etc/rc.local
 /etc/rc.local
-
-echo "  copying server public key"
-ssh ${FLOATING_DOCK_ADDRESS} cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 SCRIPT
 
