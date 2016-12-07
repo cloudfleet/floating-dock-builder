@@ -2,8 +2,9 @@
 
 BUILDER_ADDRESS=$1
 FLOATING_DOCK_ADDRESS=$2
-BUILDER_PREFIX=$3
-BUILDER_NUMBER=$4
+FLOATING_DOCK_NEW_BUILDER_KEY=$2
+BUILDER_PREFIX=$4
+BUILDER_NUMBER=$5
 
 LOGIN_USER=pi
 
@@ -35,7 +36,7 @@ tar -xzf scripts.tar.gz
 
 
 echo "#!/bin/bash" > /etc/rc.local
-echo "nohup python ${SCRIPTS_DIR}/build_runner.py ${FLOATING_DOCK_ADDRESS} >> /var/log/floating_dock_runner.log &" >> /etc/rc.local
+echo "nohup python ${SCRIPTS_DIR}/build_runner.py ${FLOATING_DOCK_ADDRESS} ${FLOATING_DOCK_NEW_BUILDER_KEY} >> /var/log/floating_dock_runner.log &" >> /etc/rc.local
 chmod +x /etc/rc.local
 /etc/rc.local
 
