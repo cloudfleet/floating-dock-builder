@@ -13,6 +13,7 @@ SCRIPTS_DIR=/opt/floating-dock/builder
 
 SCRIPT_FILE=/tmp/floating-dock-${FLOATING_DOCK_ADDRESS}-${BUILDER_ADDRESS}-script
 
+
 cat > ${SCRIPT_FILE} <<SCRIPT
 
 sudo su -
@@ -21,11 +22,11 @@ echo "Installing dependencies"
 curl -s https://packagecloud.io/install/repositories/Hypriot/Schatzkiste/script.deb.sh | sudo bash
 apt-get -y install docker-hypriot
 
-echo "Setting Hostname to ${BUILDER_PREFIX}${BUILDER_NUMBER}"
+echo "Setting Hostname to ${NEW_HOSTNAME}"
 
-sed -i s/\$(hostname)/${BUILDER_PREFIX}${BUILDER_NUMBER}/g /etc/hosts
-sed -i s/\$(hostname)/${BUILDER_PREFIX}${BUILDER_NUMBER}/g /etc/hostname
-hostname ${BUILDER_PREFIX}${BUILDER_NUMBER}
+sed -i s/\$(hostname)/${NEW_HOSTNAME}/g /etc/hosts
+sed -i s/\$(hostname)/${NEW_HOSTNAME}/g /etc/hostname
+hostname ${NEW_HOSTNAME}
 
 
 mkdir -p ${SCRIPTS_DIR}
