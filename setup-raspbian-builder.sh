@@ -20,9 +20,7 @@ cat > ${SCRIPT_FILE} <<SCRIPT
 sudo su -
 
 echo "Installing dependencies"
-curl -s https://packagecloud.io/install/repositories/Hypriot/Schatzkiste/script.deb.sh | sudo bash
-apt-get -y install docker-hypriot
-
+wget -nv -O - https://get.docker.com/ | sh
 echo "Setting Hostname to ${NEW_HOSTNAME}"
 
 sed -i s/\$(hostname)/${NEW_HOSTNAME}/g /etc/hosts
@@ -32,6 +30,8 @@ hostname ${NEW_HOSTNAME}
 
 mkdir -p ${CONFIG_DIR}
 
+
+rm -rf ${SCRIPTS_DIR}
 mkdir -p ${SCRIPTS_DIR}
 cd ${SCRIPTS_DIR}
 
@@ -46,4 +46,4 @@ chmod +x /etc/rc.local
 
 SCRIPT
 
-ssh -o ForwardAgent=yes $LOGIN_USER@$BUILDER_ADDRESS < ${SCRIPT_FILE}
+ssh $LOGIN_USER@$BUILDER_ADDRESS < ${SCRIPT_FILE}
