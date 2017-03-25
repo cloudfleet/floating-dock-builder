@@ -40,7 +40,7 @@ tar -xzf scripts.tar.gz
 
 
 echo "#!/bin/bash" > /etc/rc.local
-echo "nohup python -u ${SCRIPTS_DIR}/build_runner.py ${FLOATING_DOCK_ADDRESS} ${FLOATING_DOCK_NEW_BUILDER_KEY} ${NEW_HOSTNAME} >> /var/log/floating_dock_runner.log 2> &1 &" >> /etc/rc.local
+echo "nohup python -u ${SCRIPTS_DIR}/build_runner.py ${FLOATING_DOCK_ADDRESS} ${FLOATING_DOCK_NEW_BUILDER_KEY} ${NEW_HOSTNAME} >> /var/log/floating_dock_runner.log 2>&1 &" >> /etc/rc.local
 chmod +x /etc/rc.local
 /etc/rc.local
 
